@@ -1,52 +1,123 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/models/assistant_message.dart';
-import '../../domain/models/instruction_step.dart';
+import '../../domain/services/assistant_service.dart';
 import '../widgets/assistant_bottom_nav.dart';
 import '../widgets/assistant_header_card.dart';
 import '../widgets/chat_input_card.dart';
 import '../widgets/chat_message_bubble.dart';
+import '../widgets/assistant_typing_bubble.dart';
 import '../widgets/emergency_alert_card.dart';
-import '../widgets/instruction_step_card.dart';
 
-class AssistantScreen extends StatelessWidget {
-  const AssistantScreen({super.key});
+class AssistantScreen extends StatefulWidget {
+  const AssistantScreen({
+    super.key,
+    required this.assistantService,
+  });
 
-  static const _messages = [
+  final AssistantService assistantService;
+
+  @override
+  State<AssistantScreen> createState() => _AssistantScreenState();
+}
+
+class _AssistantScreenState extends State<AssistantScreen> {
+  static const _initialMessages = [
     AssistantMessage(
       text: 'Ola! Sou seu assistente CUIDA+. Como posso auxiliar sua saude hoje?',
       sender: MessageSender.assistant,
     ),
-    AssistantMessage(
-      text: 'Pode me orientar sobre como agir em caso de engasgo?',
-      sender: MessageSender.user,
-    ),
-    AssistantMessage(
-      text: 'Com certeza. Para desobstruir as vias aereas (Manobra de Heimlich), siga estes passos:',
-      sender: MessageSender.assistant,
-    ),
   ];
 
-  static const _steps = [
-    InstructionStep(
-      number: '01',
-      description:
-          'Posicione-se por tras da pessoa e envolva os bracos em volta da cintura dela.',
-      icon: Icons.back_hand_outlined,
-    ),
-    InstructionStep(
-      number: '02',
-      description:
-          'Feche uma das maos e coloque o lado do polegar logo acima do umbigo.',
-      icon: Icons.pan_tool_outlined,
-    ),
-    InstructionStep(
-      number: '03',
-      description:
-          'Pressione o abdomen com movimentos rapidos para dentro e para cima.',
-      icon: Icons.front_hand_outlined,
-    ),
-  ];
+  final TextEditingController _messageController = TextEditingController();
+  final List<AssistantMessage> _conversation = List.of(_initialMessages);
+  final ScrollController _scrollController = ScrollController();
+  bool _isSending = false;
+  String? _conversationId;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOut,
+    );
+  }
+
+  Future<void> _sendMessage() async {
+    final text = _messageController.text.trim();
+    if (text.isEmpty || _isSending) {
+      return;
+    }
+
+    setState(() {
+      _errorMessage = null;
+      _conversation.add(
+        AssistantMessage(
+          text: text,
+          sender: MessageSender.user,
+        ),
+      );
+      _messageController.clear();
+      _isSending = true;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+
+    try {
+      final reply = await widget.assistantService.sendMessage(
+        prompt: text,
+        conversation: List.unmodifiable(_conversation),
+        conversationId: _conversationId,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _conversationId = reply.conversationId ?? _conversationId;
+        _conversation.add(
+          AssistantMessage(
+            text: reply.message,
+            sender: MessageSender.assistant,
+            summary: reply.summary,
+            immediateSteps: reply.immediateSteps,
+            alerts: reply.alerts,
+            followUpQuestion: reply.followUpQuestion,
+          ),
+        );
+        _isSending = false;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _isSending = false;
+        _errorMessage = error.toString();
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +129,7 @@ class AssistantScreen extends StatelessWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
+                controller: _scrollController,
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -89,25 +161,42 @@ class AssistantScreen extends StatelessWidget {
                         children: [
                           const AssistantHeaderCard(),
                           const SizedBox(height: 18),
-                          for (final message in _messages) ...[
+                          for (final message in _conversation) ...[
                             ChatMessageBubble(message: message),
-                            const SizedBox(height: 12),
-                          ],
-                          for (final step in _steps) ...[
-                            InstructionStepCard(step: step),
                             const SizedBox(height: 12),
                           ],
                           const EmergencyAlertCard(),
                           const SizedBox(height: 18),
-                          const ChatInputCard(),
-                          const SizedBox(height: 18),
-                          Text(
-                            '...',
-                            style: theme.textTheme.headlineMedium?.copyWith(
-                              color: const Color(0xFFB4BBB7),
-                              letterSpacing: 4,
+                          if (_errorMessage != null) ...[
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFF5F3),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: const Color(0xFFF1D5D0),
+                                ),
+                              ),
+                              child: Text(
+                                _errorMessage!,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: const Color(0xFFC05642),
+                                ),
+                              ),
                             ),
+                            const SizedBox(height: 18),
+                          ],
+                          ChatInputCard(
+                            controller: _messageController,
+                            onSend: _sendMessage,
+                            enabled: !_isSending,
                           ),
+                          const SizedBox(height: 18),
+                          if (_isSending)
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: AssistantTypingBubble(),
+                            ),
                         ],
                       ),
                     ),

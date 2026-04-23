@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'core/config/app_config.dart';
+import 'features/assistant/data/services/http_assistant_service.dart';
+import 'features/assistant/data/services/mock_assistant_service.dart';
+import 'features/assistant/domain/services/assistant_service.dart';
 import 'features/assistant/presentation/screens/assistant_screen.dart';
 
 class CuidaMaisApp extends StatelessWidget {
@@ -51,7 +55,20 @@ class CuidaMaisApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const AssistantScreen(),
+      home: AssistantScreen(
+        assistantService: _buildAssistantService(),
+      ),
     );
+  }
+
+  AssistantService _buildAssistantService() {
+    if (AppConfig.hasAssistantApi) {
+      return HttpAssistantService(
+        baseUrl: AppConfig.assistantApiBaseUrl,
+        path: AppConfig.assistantApiPath,
+      );
+    }
+
+    return MockAssistantService();
   }
 }
