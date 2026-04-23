@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class AssistantBottomNav extends StatelessWidget {
-  const AssistantBottomNav({super.key});
+  const AssistantBottomNav({
+    super.key,
+    required this.currentIndex,
+    required this.onSelected,
+  });
+
+  final int currentIndex;
+  final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -19,20 +26,20 @@ class AssistantBottomNav extends StatelessWidget {
           _BottomNavItem(
             icon: Icons.personal_injury_outlined,
             label: 'INCIDENTES',
-            selected: false,
-            onTap: () {},
+            selected: currentIndex == 0,
+            onTap: () => onSelected(0),
           ),
           _BottomNavItem(
             icon: Icons.support_agent,
             label: 'ASSISTENTE',
-            selected: true,
-            onTap: () {},
+            selected: currentIndex == 1,
+            onTap: () => onSelected(1),
           ),
           _BottomNavItem(
             icon: Icons.call_outlined,
             label: 'CONTATOS',
-            selected: false,
-            onTap: () {},
+            selected: currentIndex == 2,
+            onTap: () => onSelected(2),
           ),
         ],
       ),

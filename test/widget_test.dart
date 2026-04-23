@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:cuidamais/features/assistant/data/services/assistant_conversation_storage.dart';
 import 'package:cuidamais/features/assistant/domain/models/assistant_message.dart';
 import 'package:cuidamais/features/assistant/domain/models/assistant_reply.dart';
 import 'package:cuidamais/features/assistant/domain/services/assistant_service.dart';
 import 'package:cuidamais/features/assistant/presentation/screens/assistant_screen.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   testWidgets('assistant screen renders initial content', (
     WidgetTester tester,
   ) async {
@@ -14,13 +20,15 @@ void main() {
       MaterialApp(
         home: AssistantScreen(
           assistantService: _FakeAssistantService(),
+          conversationStorage: const AssistantConversationStorage(),
         ),
       ),
     );
 
+    await tester.pumpAndSettle();
+
     expect(find.text('CUIDA+'), findsOneWidget);
     expect(find.text('Assistente Virtual'), findsOneWidget);
-    expect(find.text('ASSISTENTE'), findsOneWidget);
     expect(find.textContaining('Como posso auxiliar'), findsOneWidget);
   });
 
@@ -31,9 +39,12 @@ void main() {
       MaterialApp(
         home: AssistantScreen(
           assistantService: _FakeAssistantService(),
+          conversationStorage: const AssistantConversationStorage(),
         ),
       ),
     );
+
+    await tester.pumpAndSettle();
 
     final textField = find.byType(TextField);
 

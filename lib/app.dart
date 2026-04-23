@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'core/config/app_config.dart';
+import 'features/app/presentation/screens/app_shell_screen.dart';
+import 'features/assistant/data/services/assistant_conversation_storage.dart';
 import 'features/assistant/data/services/http_assistant_service.dart';
 import 'features/assistant/data/services/mock_assistant_service.dart';
 import 'features/assistant/domain/services/assistant_service.dart';
-import 'features/assistant/presentation/screens/assistant_screen.dart';
 
 class CuidaMaisApp extends StatelessWidget {
   const CuidaMaisApp({super.key});
@@ -55,8 +56,9 @@ class CuidaMaisApp extends StatelessWidget {
           ),
         ),
       ),
-      home: AssistantScreen(
+      home: AppShellScreen(
         assistantService: _buildAssistantService(),
+        conversationStorage: const AssistantConversationStorage(),
       ),
     );
   }
