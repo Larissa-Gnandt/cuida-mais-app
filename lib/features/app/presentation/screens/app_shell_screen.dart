@@ -4,6 +4,7 @@ import '../../../assistant/data/services/assistant_conversation_storage.dart';
 import '../../../assistant/domain/services/assistant_service.dart';
 import '../../../assistant/presentation/screens/assistant_screen.dart';
 import '../../../assistant/presentation/widgets/assistant_bottom_nav.dart';
+import '../../../incidents/presentation/screens/incidents_screen.dart';
 
 class AppShellScreen extends StatefulWidget {
   const AppShellScreen({
@@ -20,14 +21,10 @@ class AppShellScreen extends StatefulWidget {
 }
 
 class _AppShellScreenState extends State<AppShellScreen> {
-  int _currentIndex = 1;
+  int _currentIndex = 0;
 
   late final List<Widget> _screens = [
-    const _PlaceholderTab(
-      title: 'Incidentes',
-      description: 'Tela sera implementada em breve.',
-      icon: Icons.personal_injury_outlined,
-    ),
+    const IncidentsScreen(),
     AssistantScreen(
       assistantService: widget.assistantService,
       conversationStorage: widget.conversationStorage,
@@ -42,10 +39,7 @@ class _AppShellScreenState extends State<AppShellScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: AssistantBottomNav(
         currentIndex: _currentIndex,
         onSelected: (index) {
