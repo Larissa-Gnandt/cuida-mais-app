@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class IncidentsScreen extends StatelessWidget {
-  const IncidentsScreen({super.key});
+  const IncidentsScreen({super.key, required this.onDailyTipTap});
+
+  final VoidCallback onDailyTipTap;
 
   static const _primaryGreen = Color(0xFF2F7A5F);
   static const _deepGreen = Color(0xFF2D8057);
@@ -76,7 +78,7 @@ class IncidentsScreen extends StatelessWidget {
                   const SizedBox(height: 18),
                   const _DomesticAccidentsCard(),
                   const SizedBox(height: 34),
-                  const _DailyTipCard(),
+                  _DailyTipCard(onTap: onDailyTipTap),
                   const SizedBox(height: 26),
                 ],
               ),
@@ -458,69 +460,78 @@ class _DomesticAccidentTile extends StatelessWidget {
 }
 
 class _DailyTipCard extends StatelessWidget {
-  const _DailyTipCard();
+  const _DailyTipCard({required this.onTap});
+
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      height: 118,
-      padding: const EdgeInsets.fromLTRB(38, 20, 20, 20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4EAF80),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x1A2F7A5F),
-            blurRadius: 22,
-            offset: Offset(0, 14),
+        onTap: onTap,
+        child: Ink(
+          height: 118,
+          padding: const EdgeInsets.fromLTRB(38, 20, 20, 20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF4EAF80),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x1A2F7A5F),
+                blurRadius: 22,
+                offset: Offset(0, 14),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'DICA DO DIA',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.78),
-                    fontSize: 9,
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w800,
-                  ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'DICA DO DIA',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.78),
+                        fontSize: 9,
+                        letterSpacing: 2,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      'Monte seu kit de\nprimeiros socorros',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontSize: 16,
+                        height: 1.1,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 7),
-                Text(
-                  'Monte seu kit de\nprimeiros socorros',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
-                    fontSize: 16,
-                    height: 1.1,
-                    fontWeight: FontWeight.w800,
-                  ),
+              ),
+              Container(
+                width: 76,
+                height: 76,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  shape: BoxShape.circle,
                 ),
-              ],
-            ),
+                child: const Icon(
+                  Icons.medical_services,
+                  color: Color(0xFFC8F1DC),
+                  size: 34,
+                ),
+              ),
+            ],
           ),
-          Container(
-            width: 76,
-            height: 76,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.16),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.medical_services,
-              color: Color(0xFFC8F1DC),
-              size: 34,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

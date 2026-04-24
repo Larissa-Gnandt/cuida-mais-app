@@ -4,6 +4,8 @@ import '../../../assistant/data/services/assistant_conversation_storage.dart';
 import '../../../assistant/domain/services/assistant_service.dart';
 import '../../../assistant/presentation/screens/assistant_screen.dart';
 import '../../../assistant/presentation/widgets/assistant_bottom_nav.dart';
+import '../../../contacts/presentation/screens/emergency_contacts_screen.dart';
+import '../../../incidents/presentation/screens/first_aid_kit_screen.dart';
 import '../../../incidents/presentation/screens/incidents_screen.dart';
 
 class AppShellScreen extends StatefulWidget {
@@ -22,85 +24,38 @@ class AppShellScreen extends StatefulWidget {
 
 class _AppShellScreenState extends State<AppShellScreen> {
   int _currentIndex = 0;
+  bool _showFirstAidKit = false;
 
   late final List<Widget> _screens = [
-    const IncidentsScreen(),
+    IncidentsScreen(onDailyTipTap: _openFirstAidKit),
     AssistantScreen(
       assistantService: widget.assistantService,
       conversationStorage: widget.conversationStorage,
     ),
-    const _PlaceholderTab(
-      title: 'Contatos',
-      description: 'Tela sera implementada em breve.',
-      icon: Icons.call_outlined,
-    ),
+    const EmergencyContactsScreen(),
   ];
+
+  void _openFirstAidKit() {
+    setState(() {
+      _currentIndex = 1;
+      _showFirstAidKit = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: _showFirstAidKit
+          ? const FirstAidKitScreen()
+          : IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: AssistantBottomNav(
         currentIndex: _currentIndex,
         onSelected: (index) {
           setState(() {
             _currentIndex = index;
+            _showFirstAidKit = false;
           });
         },
-      ),
-    );
-  }
-}
-
-class _PlaceholderTab extends StatelessWidget {
-  const _PlaceholderTab({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-
-  final String title;
-  final String description;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(28),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x110E1D16),
-                  blurRadius: 18,
-                  offset: Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 42, color: const Color(0xFF2F7A5F)),
-                const SizedBox(height: 16),
-                Text(title, style: theme.textTheme.headlineMedium),
-                const SizedBox(height: 12),
-                Text(
-                  description,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge,
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
