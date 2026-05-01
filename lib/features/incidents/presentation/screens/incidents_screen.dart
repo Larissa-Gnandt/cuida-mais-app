@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
 class IncidentsScreen extends StatelessWidget {
-  const IncidentsScreen({super.key, required this.onDailyTipTap});
+  const IncidentsScreen({
+    super.key,
+    required this.onDailyTipTap,
+    required this.onCommonEmergenciesTap,
+    required this.onChokingTap,
+  });
 
   final VoidCallback onDailyTipTap;
+  final VoidCallback onCommonEmergenciesTap;
+  final VoidCallback onChokingTap;
 
   static const _primaryGreen = Color(0xFF2F7A5F);
   static const _deepGreen = Color(0xFF2D8057);
@@ -41,10 +48,10 @@ class IncidentsScreen extends StatelessWidget {
                     icon: Icons.medical_services_outlined,
                     title: 'Emergências comuns',
                     action: 'Ver todos',
-                    onActionTap: () {},
+                    onActionTap: onCommonEmergenciesTap,
                   ),
                   const SizedBox(height: 18),
-                  const _CommonEmergenciesCarousel(),
+                  _CommonEmergenciesCarousel(onChokingTap: onChokingTap),
                   const SizedBox(height: 40),
                   const _SectionHeader(
                     icon: Icons.warning_amber_rounded,
@@ -187,7 +194,9 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _CommonEmergenciesCarousel extends StatelessWidget {
-  const _CommonEmergenciesCarousel();
+  const _CommonEmergenciesCarousel({required this.onChokingTap});
+
+  final VoidCallback onChokingTap;
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +213,10 @@ class _CommonEmergenciesCarousel extends StatelessWidget {
         clipBehavior: Clip.none,
         itemBuilder: (context, index) {
           final emergency = emergencies[index];
-          return _CommonEmergencyCard(emergency: emergency);
+          return _CommonEmergencyCard(
+            emergency: emergency,
+            onTap: index == 0 ? onChokingTap : null,
+          );
         },
         separatorBuilder: (context, index) => const SizedBox(width: 14),
         itemCount: emergencies.length,
@@ -221,46 +233,54 @@ class _CommonEmergencyData {
 }
 
 class _CommonEmergencyCard extends StatelessWidget {
-  const _CommonEmergencyCard({required this.emergency});
+  const _CommonEmergencyCard({required this.emergency, this.onTap});
 
   final _CommonEmergencyData emergency;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      width: 102,
-      padding: const EdgeInsets.fromLTRB(12, 18, 12, 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0F0E1D16),
-            blurRadius: 18,
-            offset: Offset(0, 10),
+        onTap: onTap,
+        child: Ink(
+          width: 102,
+          padding: const EdgeInsets.fromLTRB(12, 18, 12, 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0F0E1D16),
+                blurRadius: 18,
+                offset: Offset(0, 10),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _IconBubble(
-            icon: emergency.icon,
-            backgroundColor: const Color(0xFFF0F5F3),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _IconBubble(
+                icon: emergency.icon,
+                backgroundColor: const Color(0xFFF0F5F3),
+              ),
+              Text(
+                emergency.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: IncidentsScreen._ink,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
           ),
-          Text(
-            emergency.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: IncidentsScreen._ink,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -5,6 +5,8 @@ import '../../../assistant/domain/services/assistant_service.dart';
 import '../../../assistant/presentation/screens/assistant_screen.dart';
 import '../../../assistant/presentation/widgets/assistant_bottom_nav.dart';
 import '../../../contacts/presentation/screens/emergency_contacts_screen.dart';
+import '../../../incidents/presentation/screens/choking_emergency_screen.dart';
+import '../../../incidents/presentation/screens/common_emergencies_screen.dart';
 import '../../../incidents/presentation/screens/first_aid_kit_screen.dart';
 import '../../../incidents/presentation/screens/incidents_screen.dart';
 
@@ -25,9 +27,15 @@ class AppShellScreen extends StatefulWidget {
 class _AppShellScreenState extends State<AppShellScreen> {
   int _currentIndex = 0;
   bool _showFirstAidKit = false;
+  bool _showCommonEmergencies = false;
+  bool _showChokingEmergency = false;
 
   late final List<Widget> _screens = [
-    IncidentsScreen(onDailyTipTap: _openFirstAidKit),
+    IncidentsScreen(
+      onDailyTipTap: _openFirstAidKit,
+      onCommonEmergenciesTap: _openCommonEmergencies,
+      onChokingTap: _openChokingEmergency,
+    ),
     AssistantScreen(
       assistantService: widget.assistantService,
       conversationStorage: widget.conversationStorage,
@@ -39,6 +47,26 @@ class _AppShellScreenState extends State<AppShellScreen> {
     setState(() {
       _currentIndex = 1;
       _showFirstAidKit = true;
+      _showCommonEmergencies = false;
+      _showChokingEmergency = false;
+    });
+  }
+
+  void _openCommonEmergencies() {
+    setState(() {
+      _currentIndex = 0;
+      _showCommonEmergencies = true;
+      _showFirstAidKit = false;
+      _showChokingEmergency = false;
+    });
+  }
+
+  void _openChokingEmergency() {
+    setState(() {
+      _currentIndex = 0;
+      _showChokingEmergency = true;
+      _showCommonEmergencies = false;
+      _showFirstAidKit = false;
     });
   }
 
@@ -47,6 +75,10 @@ class _AppShellScreenState extends State<AppShellScreen> {
     return Scaffold(
       body: _showFirstAidKit
           ? const FirstAidKitScreen()
+          : _showChokingEmergency
+          ? const ChokingEmergencyScreen()
+          : _showCommonEmergencies
+          ? CommonEmergenciesScreen(onChokingTap: _openChokingEmergency)
           : IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: AssistantBottomNav(
         currentIndex: _currentIndex,
@@ -54,6 +86,8 @@ class _AppShellScreenState extends State<AppShellScreen> {
           setState(() {
             _currentIndex = index;
             _showFirstAidKit = false;
+            _showCommonEmergencies = false;
+            _showChokingEmergency = false;
           });
         },
       ),
