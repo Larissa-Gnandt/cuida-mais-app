@@ -6,11 +6,27 @@ class IncidentsScreen extends StatelessWidget {
     required this.onDailyTipTap,
     required this.onCommonEmergenciesTap,
     required this.onChokingTap,
+    required this.onBleedingTap,
+    required this.onBurnTap,
+    required this.onChestPainTap,
+    required this.onStrokeTap,
+    required this.onSeizureTap,
+    required this.onPoisoningTap,
+    required this.onElectricShockTap,
+    required this.onDrowningTap,
   });
 
   final VoidCallback onDailyTipTap;
   final VoidCallback onCommonEmergenciesTap;
   final VoidCallback onChokingTap;
+  final VoidCallback onBleedingTap;
+  final VoidCallback onBurnTap;
+  final VoidCallback onChestPainTap;
+  final VoidCallback onStrokeTap;
+  final VoidCallback onSeizureTap;
+  final VoidCallback onPoisoningTap;
+  final VoidCallback onElectricShockTap;
+  final VoidCallback onDrowningTap;
 
   static const _primaryGreen = Color(0xFF2F7A5F);
   static const _deepGreen = Color(0xFF2D8057);
@@ -51,7 +67,11 @@ class IncidentsScreen extends StatelessWidget {
                     onActionTap: onCommonEmergenciesTap,
                   ),
                   const SizedBox(height: 18),
-                  _CommonEmergenciesCarousel(onChokingTap: onChokingTap),
+                  _CommonEmergenciesCarousel(
+                    onChokingTap: onChokingTap,
+                    onBleedingTap: onBleedingTap,
+                    onBurnTap: onBurnTap,
+                  ),
                   const SizedBox(height: 40),
                   const _SectionHeader(
                     icon: Icons.warning_amber_rounded,
@@ -60,22 +80,25 @@ class IncidentsScreen extends StatelessWidget {
                   const SizedBox(height: 18),
                   const _ImmediateRiskCard(),
                   const SizedBox(height: 12),
-                  const _SeriousSituationTile(
+                  _SeriousSituationTile(
                     icon: Icons.monitor_heart_outlined,
                     title: 'Dor no peito',
                     subtitle: 'Possível infarto',
+                    onTap: onChestPainTap,
                   ),
                   const SizedBox(height: 14),
-                  const _SeriousSituationTile(
+                  _SeriousSituationTile(
                     icon: Icons.psychology_outlined,
                     title: 'AVC',
                     subtitle: 'Perda de movimento',
+                    onTap: onStrokeTap,
                   ),
                   const SizedBox(height: 14),
-                  const _SeriousSituationTile(
+                  _SeriousSituationTile(
                     icon: Icons.flash_on_outlined,
                     title: 'Convulsão',
                     subtitle: 'Ataque epiléptico',
+                    onTap: onSeizureTap,
                   ),
                   const SizedBox(height: 34),
                   const _SectionHeader(
@@ -83,7 +106,11 @@ class IncidentsScreen extends StatelessWidget {
                     title: 'Acidentes domésticos',
                   ),
                   const SizedBox(height: 18),
-                  const _DomesticAccidentsCard(),
+                  _DomesticAccidentsCard(
+                    onPoisoningTap: onPoisoningTap,
+                    onElectricShockTap: onElectricShockTap,
+                    onDrowningTap: onDrowningTap,
+                  ),
                   const SizedBox(height: 34),
                   _DailyTipCard(onTap: onDailyTipTap),
                   const SizedBox(height: 26),
@@ -194,9 +221,15 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _CommonEmergenciesCarousel extends StatelessWidget {
-  const _CommonEmergenciesCarousel({required this.onChokingTap});
+  const _CommonEmergenciesCarousel({
+    required this.onChokingTap,
+    required this.onBleedingTap,
+    required this.onBurnTap,
+  });
 
   final VoidCallback onChokingTap;
+  final VoidCallback onBleedingTap;
+  final VoidCallback onBurnTap;
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +248,12 @@ class _CommonEmergenciesCarousel extends StatelessWidget {
           final emergency = emergencies[index];
           return _CommonEmergencyCard(
             emergency: emergency,
-            onTap: index == 0 ? onChokingTap : null,
+            onTap: switch (index) {
+              0 => onChokingTap,
+              1 => onBleedingTap,
+              2 => onBurnTap,
+              _ => null,
+            },
           );
         },
         separatorBuilder: (context, index) => const SizedBox(width: 14),
@@ -348,64 +386,86 @@ class _SeriousSituationTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
+    required this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      height: 70,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: IncidentsScreen._mutedTile,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: [
-          _IconBubble(icon: icon),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: IncidentsScreen._ink,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF4E5F56),
-                    fontSize: 10,
-                    height: 1.2,
-                  ),
-                ),
-              ],
-            ),
+        onTap: onTap,
+        child: Ink(
+          height: 70,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: IncidentsScreen._mutedTile,
+            borderRadius: BorderRadius.circular(18),
           ),
-        ],
+          child: Row(
+            children: [
+              _IconBubble(icon: icon),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: IncidentsScreen._ink,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: const Color(0xFF4E5F56),
+                        fontSize: 10,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right,
+                color: Color(0xFF93A199),
+                size: 22,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
 class _DomesticAccidentsCard extends StatelessWidget {
-  const _DomesticAccidentsCard();
+  const _DomesticAccidentsCard({
+    required this.onPoisoningTap,
+    required this.onElectricShockTap,
+    required this.onDrowningTap,
+  });
+
+  final VoidCallback onPoisoningTap;
+  final VoidCallback onElectricShockTap;
+  final VoidCallback onDrowningTap;
 
   @override
   Widget build(BuildContext context) {
@@ -424,7 +484,15 @@ class _DomesticAccidentsCard extends StatelessWidget {
       child: Column(
         children: [
           for (var i = 0; i < accidents.length; i++) ...[
-            _DomesticAccidentTile(accident: accidents[i]),
+            _DomesticAccidentTile(
+              accident: accidents[i],
+              onTap: switch (i) {
+                0 => onPoisoningTap,
+                1 => onElectricShockTap,
+                2 => onDrowningTap,
+                _ => null,
+              },
+            ),
             if (i != accidents.length - 1) const SizedBox(height: 6),
           ],
         ],
@@ -441,39 +509,51 @@ class _DomesticAccidentData {
 }
 
 class _DomesticAccidentTile extends StatelessWidget {
-  const _DomesticAccidentTile({required this.accident});
+  const _DomesticAccidentTile({required this.accident, required this.onTap});
 
   final _DomesticAccidentData accident;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      height: 58,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          _IconBubble(icon: accident.icon, size: 36, iconSize: 19),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              accident.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: IncidentsScreen._ink,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
+        onTap: onTap,
+        child: Ink(
+          height: 58,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
           ),
-          const Icon(Icons.chevron_right, color: Color(0xFFA9B6AE), size: 21),
-        ],
+          child: Row(
+            children: [
+              _IconBubble(icon: accident.icon, size: 36, iconSize: 19),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  accident.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: IncidentsScreen._ink,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right,
+                color: Color(0xFFA9B6AE),
+                size: 21,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

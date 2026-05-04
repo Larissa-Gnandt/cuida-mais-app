@@ -15,7 +15,7 @@ Preencha ao menos:
 ```env
 OPENAI_API_KEY=sua_chave_aqui
 OPENAI_MODEL=gpt-5
-PORT=3000
+PORT=3001
 ```
 
 ## 2. Instalar dependencias
@@ -30,7 +30,7 @@ npm install
 npm run dev
 ```
 
-O servidor sobe em `http://localhost:3000`.
+O servidor sobe em `http://localhost:3001`.
 
 ## 4. Endpoint esperado pelo Flutter
 
@@ -64,6 +64,6 @@ Na raiz do app:
 
 ```bash
 flutter run \
-  --dart-define=ASSISTANT_API_BASE_URL=http://localhost:3000 \
+  --dart-define=ASSISTANT_API_BASE_URL=http://localhost:3001 \
   --dart-define=ASSISTANT_API_PATH=/assistant/message
 ```

@@ -2,9 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CommonEmergenciesScreen extends StatelessWidget {
-  const CommonEmergenciesScreen({super.key, required this.onChokingTap});
+  const CommonEmergenciesScreen({
+    super.key,
+    required this.onChokingTap,
+    required this.onBleedingTap,
+    required this.onBurnTap,
+  });
 
   final VoidCallback onChokingTap;
+  final VoidCallback onBleedingTap;
+  final VoidCallback onBurnTap;
 
   static const _primaryGreen = Color(0xFF2F7A5F);
   static const _deepGreen = Color(0xFF246D49);
@@ -54,16 +61,18 @@ class CommonEmergenciesScreen extends StatelessWidget {
                           onTap: onChokingTap,
                         ),
                         const SizedBox(height: 14),
-                        const _EmergencyGuideTile(
+                        _EmergencyGuideTile(
                           icon: Icons.bloodtype_outlined,
                           title: 'Sangramento',
                           subtitle: 'Compressão e controle de hemorragias',
+                          onTap: onBleedingTap,
                         ),
                         const SizedBox(height: 14),
-                        const _EmergencyGuideTile(
+                        _EmergencyGuideTile(
                           icon: Icons.local_fire_department_outlined,
                           title: 'Queimadura',
                           subtitle: 'Resfriamento e proteção da pele',
+                          onTap: onBurnTap,
                         ),
                         const SizedBox(height: 28),
                         const _ImmediateHelpCard(),
