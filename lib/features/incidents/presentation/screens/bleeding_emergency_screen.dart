@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class BleedingEmergencyScreen extends StatelessWidget {
-  const BleedingEmergencyScreen({super.key});
+  const BleedingEmergencyScreen({super.key, required this.onDismiss});
+
+  final VoidCallback onDismiss;
 
   static const _primaryGreen = Color(0xFF2F7A5F);
   static const _softCanvas = Color(0xFFF4FBF5);
@@ -18,15 +20,22 @@ class BleedingEmergencyScreen extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20, bottom: 14),
-              child: Text(
-                'CUIDA+',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontSize: 20,
-                  color: const Color(0xFF1F6A4C),
-                  fontWeight: FontWeight.w800,
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onDismiss,
+              child: SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 14),
+                  child: Text(
+                    'CUIDA+',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontSize: 20,
+                      color: const Color(0xFF1F6A4C),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
               ),
             ),

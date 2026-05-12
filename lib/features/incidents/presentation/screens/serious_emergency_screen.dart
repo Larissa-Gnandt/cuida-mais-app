@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
 class ChestPainEmergencyScreen extends StatelessWidget {
-  const ChestPainEmergencyScreen({super.key});
+  const ChestPainEmergencyScreen({super.key, required this.onDismiss});
+
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
-    return const _SeriousEmergencyScreen(
+    return _SeriousEmergencyScreen(
+      onDismiss: onDismiss,
       icon: Icons.monitor_heart_outlined,
       title: 'Como agir em caso de\ndor no peito?',
-      steps: [
+      steps: const [
         _EmergencyStep(
           number: '01',
           icon: Icons.call_outlined,
@@ -35,14 +38,17 @@ class ChestPainEmergencyScreen extends StatelessWidget {
 }
 
 class StrokeEmergencyScreen extends StatelessWidget {
-  const StrokeEmergencyScreen({super.key});
+  const StrokeEmergencyScreen({super.key, required this.onDismiss});
+
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
-    return const _SeriousEmergencyScreen(
+    return _SeriousEmergencyScreen(
+      onDismiss: onDismiss,
       icon: Icons.psychology_outlined,
       title: 'Como agir em caso de\nAVC?',
-      steps: [
+      steps: const [
         _EmergencyStep(
           number: '01',
           icon: Icons.record_voice_over_outlined,
@@ -69,14 +75,17 @@ class StrokeEmergencyScreen extends StatelessWidget {
 }
 
 class SeizureEmergencyScreen extends StatelessWidget {
-  const SeizureEmergencyScreen({super.key});
+  const SeizureEmergencyScreen({super.key, required this.onDismiss});
+
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
-    return const _SeriousEmergencyScreen(
+    return _SeriousEmergencyScreen(
+      onDismiss: onDismiss,
       icon: Icons.flash_on_outlined,
       title: 'Como agir em caso de\nconvulsão?',
-      steps: [
+      steps: const [
         _EmergencyStep(
           number: '01',
           icon: Icons.shield_outlined,
@@ -104,6 +113,7 @@ class SeizureEmergencyScreen extends StatelessWidget {
 
 class _SeriousEmergencyScreen extends StatelessWidget {
   const _SeriousEmergencyScreen({
+    required this.onDismiss,
     required this.icon,
     required this.title,
     required this.steps,
@@ -115,6 +125,7 @@ class _SeriousEmergencyScreen extends StatelessWidget {
   static const _ink = Color(0xFF17261F);
   static const _dangerRed = Color(0xFFB42318);
 
+  final VoidCallback onDismiss;
   final IconData icon;
   final String title;
   final List<_EmergencyStep> steps;
@@ -130,15 +141,22 @@ class _SeriousEmergencyScreen extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20, bottom: 14),
-              child: Text(
-                'CUIDA+',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontSize: 20,
-                  color: const Color(0xFF1F6A4C),
-                  fontWeight: FontWeight.w800,
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onDismiss,
+              child: SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 14),
+                  child: Text(
+                    'CUIDA+',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontSize: 20,
+                      color: const Color(0xFF1F6A4C),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
               ),
             ),

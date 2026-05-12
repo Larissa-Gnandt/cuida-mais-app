@@ -1,5 +1,9 @@
 # Cuida+
 
+<p align="center">
+  <img src="assets/readme/cuida-mais-cover.png" alt="Cuida+ - Primeiros Socorros" width="100%">
+</p>
+
 Cuida+ é um aplicativo Flutter de primeiros socorros criado para orientar pessoas em situações de emergência, com telas rápidas, linguagem simples e apoio de um assistente com inteligência artificial.
 
 O objetivo do app é ajudar o usuário a tomar decisões iniciais com mais calma enquanto busca atendimento adequado. Ele reúne instruções para situações comuns, situações graves e acidentes domésticos, como engasgo, sangramento, queimadura, dor no peito, AVC, convulsão, intoxicação, choque elétrico e afogamento.

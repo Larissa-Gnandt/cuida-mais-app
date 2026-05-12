@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-class IncidentsScreen extends StatelessWidget {
+class IncidentsScreen extends StatefulWidget {
   const IncidentsScreen({
     super.key,
     required this.onDailyTipTap,
     required this.onCommonEmergenciesTap,
+    required this.onEmergencyContactsTap,
     required this.onChokingTap,
     required this.onBleedingTap,
     required this.onBurnTap,
@@ -18,6 +19,7 @@ class IncidentsScreen extends StatelessWidget {
 
   final VoidCallback onDailyTipTap;
   final VoidCallback onCommonEmergenciesTap;
+  final VoidCallback onEmergencyContactsTap;
   final VoidCallback onChokingTap;
   final VoidCallback onBleedingTap;
   final VoidCallback onBurnTap;
@@ -35,11 +37,153 @@ class IncidentsScreen extends StatelessWidget {
   static const _ink = Color(0xFF21332A);
 
   @override
+  State<IncidentsScreen> createState() => _IncidentsScreenState();
+}
+
+class _IncidentsScreenState extends State<IncidentsScreen> {
+  final _searchController = TextEditingController();
+  String _query = '';
+
+  List<_SearchTarget> get _targets => [
+    _SearchTarget(
+      icon: Icons.air_outlined,
+      title: 'Engasgo',
+      subtitle: 'Manobra de Heimlich e desobstrucao',
+      category: 'Emergencia comum',
+      terms: 'engasgo engasgando sufocamento nao respira falta de ar heimlich',
+      onTap: widget.onChokingTap,
+    ),
+    _SearchTarget(
+      icon: Icons.bloodtype_outlined,
+      title: 'Sangramento',
+      subtitle: 'Compressao e controle de hemorragias',
+      category: 'Emergencia comum',
+      terms: 'sangramento sangue corte ferimento hemorragia machucado',
+      onTap: widget.onBleedingTap,
+    ),
+    _SearchTarget(
+      icon: Icons.local_fire_department_outlined,
+      title: 'Queimadura',
+      subtitle: 'Resfriamento e protecao da pele',
+      category: 'Emergencia comum',
+      terms: 'queimadura queimou fogo quente pele bolha',
+      onTap: widget.onBurnTap,
+    ),
+    _SearchTarget(
+      icon: Icons.monitor_heart_outlined,
+      title: 'Dor no peito',
+      subtitle: 'Possivel infarto',
+      category: 'Situacao grave',
+      terms: 'dor peito infarto coracao falta de ar aperto',
+      onTap: widget.onChestPainTap,
+    ),
+    _SearchTarget(
+      icon: Icons.psychology_outlined,
+      title: 'AVC',
+      subtitle: 'Rosto torto, fraqueza ou fala enrolada',
+      category: 'Situacao grave',
+      terms: 'avc derrame rosto torto fala enrolada fraqueza movimento',
+      onTap: widget.onStrokeTap,
+    ),
+    _SearchTarget(
+      icon: Icons.flash_on_outlined,
+      title: 'Convulsao',
+      subtitle: 'Crise convulsiva ou ataque epileptico',
+      category: 'Situacao grave',
+      terms: 'convulsao convulsao crise epileptica ataque tremendo desmaio',
+      onTap: widget.onSeizureTap,
+    ),
+    _SearchTarget(
+      icon: Icons.coronavirus_outlined,
+      title: 'Intoxicacao',
+      subtitle: 'Produto quimico, remedio ou veneno',
+      category: 'Acidente domestico',
+      terms: 'intoxicacao veneno produto quimico remedio ingeriu bebeu',
+      onTap: widget.onPoisoningTap,
+    ),
+    _SearchTarget(
+      icon: Icons.bolt_outlined,
+      title: 'Choque eletrico',
+      subtitle: 'Descarga eletrica e tomada',
+      category: 'Acidente domestico',
+      terms: 'choque eletrico tomada fio eletricidade descarga',
+      onTap: widget.onElectricShockTap,
+    ),
+    _SearchTarget(
+      icon: Icons.waves_outlined,
+      title: 'Afogamento',
+      subtitle: 'Pessoa aspirou agua ou nao respira',
+      category: 'Acidente domestico',
+      terms: 'afogamento agua piscina mar rio nao respira aspirou',
+      onTap: widget.onDrowningTap,
+    ),
+    _SearchTarget(
+      icon: Icons.medical_services_outlined,
+      title: 'Kit de primeiros socorros',
+      subtitle: 'Gazes, esparadrapo, soro e itens essenciais',
+      category: 'Kit',
+      terms:
+          'kit primeiros socorros gazes gaze esparadrapo band aid alcool soro agua oxigenada analgesico antitermico antialergico tesoura pinca termometro luvas',
+      onTap: widget.onDailyTipTap,
+    ),
+    _SearchTarget(
+      icon: Icons.emergency_outlined,
+      title: 'SAMU',
+      subtitle: 'Telefone 192',
+      category: 'Telefone de emergencia',
+      terms: 'samu ambulancia socorro medico telefone 192',
+      onTap: widget.onEmergencyContactsTap,
+    ),
+    _SearchTarget(
+      icon: Icons.local_fire_department_outlined,
+      title: 'Bombeiros',
+      subtitle: 'Telefone 193',
+      category: 'Telefone de emergencia',
+      terms: 'bombeiros incendio resgate fogo telefone 193',
+      onTap: widget.onEmergencyContactsTap,
+    ),
+    _SearchTarget(
+      icon: Icons.security_outlined,
+      title: 'Policia Militar',
+      subtitle: 'Telefone 190',
+      category: 'Telefone de emergencia',
+      terms: 'policia militar seguranca telefone 190',
+      onTap: widget.onEmergencyContactsTap,
+    ),
+  ];
+
+  List<_SearchTarget> get _results {
+    final normalizedQuery = _normalize(_query);
+
+    if (normalizedQuery.isEmpty) {
+      return const [];
+    }
+
+    return _targets.where((target) {
+      final haystack = _normalize(
+        '${target.title} ${target.subtitle} ${target.category} ${target.terms}',
+      );
+      return normalizedQuery
+          .split(RegExp(r'\s+'))
+          .where((term) => term.isNotEmpty)
+          .every(haystack.contains);
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final hasQuery = _query.trim().isNotEmpty;
+    final results = _results;
 
     return Scaffold(
-      backgroundColor: _softCanvas,
+      backgroundColor: IncidentsScreen._softCanvas,
       body: SafeArea(
         bottom: false,
         child: CustomScrollView(
@@ -53,67 +197,79 @@ class IncidentsScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontSize: 20,
-                      color: _primaryGreen,
+                      color: IncidentsScreen._primaryGreen,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 44),
-                  const _SearchPill(),
-                  const SizedBox(height: 34),
-                  _SectionHeader(
-                    icon: Icons.medical_services_outlined,
-                    title: 'Emergências comuns',
-                    action: 'Ver todos',
-                    onActionTap: onCommonEmergenciesTap,
-                  ),
-                  const SizedBox(height: 18),
-                  _CommonEmergenciesCarousel(
-                    onChokingTap: onChokingTap,
-                    onBleedingTap: onBleedingTap,
-                    onBurnTap: onBurnTap,
-                  ),
-                  const SizedBox(height: 40),
-                  const _SectionHeader(
-                    icon: Icons.warning_amber_rounded,
-                    title: 'Situações graves',
-                  ),
-                  const SizedBox(height: 18),
-                  const _ImmediateRiskCard(),
-                  const SizedBox(height: 12),
-                  _SeriousSituationTile(
-                    icon: Icons.monitor_heart_outlined,
-                    title: 'Dor no peito',
-                    subtitle: 'Possível infarto',
-                    onTap: onChestPainTap,
-                  ),
-                  const SizedBox(height: 14),
-                  _SeriousSituationTile(
-                    icon: Icons.psychology_outlined,
-                    title: 'AVC',
-                    subtitle: 'Perda de movimento',
-                    onTap: onStrokeTap,
-                  ),
-                  const SizedBox(height: 14),
-                  _SeriousSituationTile(
-                    icon: Icons.flash_on_outlined,
-                    title: 'Convulsão',
-                    subtitle: 'Ataque epiléptico',
-                    onTap: onSeizureTap,
+                  _SearchPill(
+                    controller: _searchController,
+                    onChanged: (value) => setState(() => _query = value),
+                    onClear: () {
+                      _searchController.clear();
+                      setState(() => _query = '');
+                    },
                   ),
                   const SizedBox(height: 34),
-                  const _SectionHeader(
-                    icon: Icons.home_work_outlined,
-                    title: 'Acidentes domésticos',
-                  ),
-                  const SizedBox(height: 18),
-                  _DomesticAccidentsCard(
-                    onPoisoningTap: onPoisoningTap,
-                    onElectricShockTap: onElectricShockTap,
-                    onDrowningTap: onDrowningTap,
-                  ),
-                  const SizedBox(height: 34),
-                  _DailyTipCard(onTap: onDailyTipTap),
-                  const SizedBox(height: 26),
+                  if (hasQuery) ...[
+                    _SearchResultsSection(results: results),
+                    const SizedBox(height: 26),
+                  ] else ...[
+                    _SectionHeader(
+                      icon: Icons.medical_services_outlined,
+                      title: 'Emergências comuns',
+                      action: 'Ver todos',
+                      onActionTap: widget.onCommonEmergenciesTap,
+                    ),
+                    const SizedBox(height: 18),
+                    _CommonEmergenciesCarousel(
+                      onChokingTap: widget.onChokingTap,
+                      onBleedingTap: widget.onBleedingTap,
+                      onBurnTap: widget.onBurnTap,
+                    ),
+                    const SizedBox(height: 40),
+                    const _SectionHeader(
+                      icon: Icons.warning_amber_rounded,
+                      title: 'Situações graves',
+                    ),
+                    const SizedBox(height: 18),
+                    const _ImmediateRiskCard(),
+                    const SizedBox(height: 12),
+                    _SeriousSituationTile(
+                      icon: Icons.monitor_heart_outlined,
+                      title: 'Dor no peito',
+                      subtitle: 'Possível infarto',
+                      onTap: widget.onChestPainTap,
+                    ),
+                    const SizedBox(height: 14),
+                    _SeriousSituationTile(
+                      icon: Icons.psychology_outlined,
+                      title: 'AVC',
+                      subtitle: 'Perda de movimento',
+                      onTap: widget.onStrokeTap,
+                    ),
+                    const SizedBox(height: 14),
+                    _SeriousSituationTile(
+                      icon: Icons.flash_on_outlined,
+                      title: 'Convulsão',
+                      subtitle: 'Ataque epiléptico',
+                      onTap: widget.onSeizureTap,
+                    ),
+                    const SizedBox(height: 34),
+                    const _SectionHeader(
+                      icon: Icons.home_work_outlined,
+                      title: 'Acidentes domésticos',
+                    ),
+                    const SizedBox(height: 18),
+                    _DomesticAccidentsCard(
+                      onPoisoningTap: widget.onPoisoningTap,
+                      onElectricShockTap: widget.onElectricShockTap,
+                      onDrowningTap: widget.onDrowningTap,
+                    ),
+                    const SizedBox(height: 34),
+                    _DailyTipCard(onTap: widget.onDailyTipTap),
+                    const SizedBox(height: 26),
+                  ],
                 ],
               ),
             ),
@@ -124,8 +280,45 @@ class IncidentsScreen extends StatelessWidget {
   }
 }
 
+String _normalize(String value) {
+  return value
+      .toLowerCase()
+      .replaceAll(RegExp('[áàâãä]'), 'a')
+      .replaceAll(RegExp('[éèêë]'), 'e')
+      .replaceAll(RegExp('[íìîï]'), 'i')
+      .replaceAll(RegExp('[óòôõö]'), 'o')
+      .replaceAll(RegExp('[úùûü]'), 'u')
+      .replaceAll('ç', 'c');
+}
+
+class _SearchTarget {
+  const _SearchTarget({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.category,
+    required this.terms,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String category;
+  final String terms;
+  final VoidCallback onTap;
+}
+
 class _SearchPill extends StatelessWidget {
-  const _SearchPill();
+  const _SearchPill({
+    required this.controller,
+    required this.onChanged,
+    required this.onClear,
+  });
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
 
   @override
   Widget build(BuildContext context) {
@@ -150,17 +343,175 @@ class _SearchPill extends StatelessWidget {
           const Icon(Icons.search, color: Color(0xFF9EAAA3), size: 22),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              'O que está acontecendo?',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            child: TextField(
+              controller: controller,
+              onChanged: onChanged,
+              textInputAction: TextInputAction.search,
+              cursorColor: IncidentsScreen._primaryGreen,
+              decoration: InputDecoration(
+                hintText: 'O que está acontecendo?',
+                border: InputBorder.none,
+                isCollapsed: true,
+                hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                  color: const Color(0xFFADB6B0),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: const Color(0xFFADB6B0),
                 fontWeight: FontWeight.w400,
               ),
             ),
           ),
+          if (controller.text.isNotEmpty) ...[
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: onClear,
+              icon: const Icon(Icons.close_rounded),
+              color: const Color(0xFF9EAAA3),
+              iconSize: 20,
+              tooltip: 'Limpar busca',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _SearchResultsSection extends StatelessWidget {
+  const _SearchResultsSection({required this.results});
+
+  final List<_SearchTarget> results;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    if (results.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(18, 22, 18, 22),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0xFFE0EAE4)),
+        ),
+        child: Text(
+          'Nenhum resultado encontrado.',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: const Color(0xFF5D6D65),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionHeader(
+          icon: Icons.manage_search_outlined,
+          title: results.length == 1
+              ? '1 resultado'
+              : '${results.length} resultados',
+        ),
+        const SizedBox(height: 16),
+        for (var index = 0; index < results.length; index++) ...[
+          _SearchResultTile(result: results[index]),
+          if (index != results.length - 1) const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+}
+
+class _SearchResultTile extends StatelessWidget {
+  const _SearchResultTile({required this.result});
+
+  final _SearchTarget result;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: result.onTap,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 74),
+          child: Ink(
+            padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFE0EAE4)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x0F0E1D16),
+                  blurRadius: 14,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                _IconBubble(icon: result.icon),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        result.category,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: IncidentsScreen._primaryGreen,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        result.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: IncidentsScreen._ink,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        result.subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: const Color(0xFF5D6D65),
+                          fontSize: 11,
+                          height: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right,
+                  color: Color(0xFF93A199),
+                  size: 22,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

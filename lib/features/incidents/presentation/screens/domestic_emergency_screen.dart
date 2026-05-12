@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
 class PoisoningEmergencyScreen extends StatelessWidget {
-  const PoisoningEmergencyScreen({super.key});
+  const PoisoningEmergencyScreen({super.key, required this.onDismiss});
+
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
-    return const _DomesticEmergencyScreen(
+    return _DomesticEmergencyScreen(
+      onDismiss: onDismiss,
       icon: Icons.coronavirus_outlined,
       title: 'Como agir em caso de\nintoxicação?',
-      steps: [
+      steps: const [
         _EmergencyStep(
           number: '01',
           icon: Icons.call_outlined,
@@ -35,14 +38,17 @@ class PoisoningEmergencyScreen extends StatelessWidget {
 }
 
 class ElectricShockEmergencyScreen extends StatelessWidget {
-  const ElectricShockEmergencyScreen({super.key});
+  const ElectricShockEmergencyScreen({super.key, required this.onDismiss});
+
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
-    return const _DomesticEmergencyScreen(
+    return _DomesticEmergencyScreen(
+      onDismiss: onDismiss,
       icon: Icons.bolt_outlined,
       title: 'Como agir em caso de\nchoque elétrico?',
-      steps: [
+      steps: const [
         _EmergencyStep(
           number: '01',
           icon: Icons.power_settings_new_outlined,
@@ -69,14 +75,17 @@ class ElectricShockEmergencyScreen extends StatelessWidget {
 }
 
 class DrowningEmergencyScreen extends StatelessWidget {
-  const DrowningEmergencyScreen({super.key});
+  const DrowningEmergencyScreen({super.key, required this.onDismiss});
+
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
-    return const _DomesticEmergencyScreen(
+    return _DomesticEmergencyScreen(
+      onDismiss: onDismiss,
       icon: Icons.waves_outlined,
       title: 'Como agir em caso de\nafogamento?',
-      steps: [
+      steps: const [
         _EmergencyStep(
           number: '01',
           icon: Icons.support_outlined,
@@ -104,6 +113,7 @@ class DrowningEmergencyScreen extends StatelessWidget {
 
 class _DomesticEmergencyScreen extends StatelessWidget {
   const _DomesticEmergencyScreen({
+    required this.onDismiss,
     required this.icon,
     required this.title,
     required this.steps,
@@ -115,6 +125,7 @@ class _DomesticEmergencyScreen extends StatelessWidget {
   static const _ink = Color(0xFF17261F);
   static const _dangerRed = Color(0xFFB42318);
 
+  final VoidCallback onDismiss;
   final IconData icon;
   final String title;
   final List<_EmergencyStep> steps;
@@ -130,15 +141,22 @@ class _DomesticEmergencyScreen extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20, bottom: 14),
-              child: Text(
-                'CUIDA+',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontSize: 20,
-                  color: const Color(0xFF1F6A4C),
-                  fontWeight: FontWeight.w800,
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onDismiss,
+              child: SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 14),
+                  child: Text(
+                    'CUIDA+',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontSize: 20,
+                      color: const Color(0xFF1F6A4C),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
               ),
             ),

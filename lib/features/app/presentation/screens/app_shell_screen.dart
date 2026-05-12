@@ -46,6 +46,7 @@ class _AppShellScreenState extends State<AppShellScreen> {
     IncidentsScreen(
       onDailyTipTap: _openFirstAidKit,
       onCommonEmergenciesTap: _openCommonEmergencies,
+      onEmergencyContactsTap: _openEmergencyContacts,
       onChokingTap: _openChokingEmergency,
       onBleedingTap: _openBleedingEmergency,
       onBurnTap: _openBurnEmergency,
@@ -63,9 +64,43 @@ class _AppShellScreenState extends State<AppShellScreen> {
     const EmergencyContactsScreen(),
   ];
 
+  void _openEmergencyContacts() {
+    setState(() {
+      _currentIndex = 2;
+      _showFirstAidKit = false;
+      _showCommonEmergencies = false;
+      _showChokingEmergency = false;
+      _showBleedingEmergency = false;
+      _showBurnEmergency = false;
+      _showChestPainEmergency = false;
+      _showStrokeEmergency = false;
+      _showSeizureEmergency = false;
+      _showPoisoningEmergency = false;
+      _showElectricShockEmergency = false;
+      _showDrowningEmergency = false;
+    });
+  }
+
+  void _closeIncidentCard() {
+    setState(() {
+      _currentIndex = 0;
+      _showFirstAidKit = false;
+      _showCommonEmergencies = false;
+      _showChokingEmergency = false;
+      _showBleedingEmergency = false;
+      _showBurnEmergency = false;
+      _showChestPainEmergency = false;
+      _showStrokeEmergency = false;
+      _showSeizureEmergency = false;
+      _showPoisoningEmergency = false;
+      _showElectricShockEmergency = false;
+      _showDrowningEmergency = false;
+    });
+  }
+
   void _openFirstAidKit() {
     setState(() {
-      _currentIndex = 1;
+      _currentIndex = 0;
       _showFirstAidKit = true;
       _showCommonEmergencies = false;
       _showChokingEmergency = false;
@@ -254,27 +289,28 @@ class _AppShellScreenState extends State<AppShellScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _showFirstAidKit
-          ? const FirstAidKitScreen()
+          ? FirstAidKitScreen(onDismiss: _closeIncidentCard)
           : _showDrowningEmergency
-          ? const DrowningEmergencyScreen()
+          ? DrowningEmergencyScreen(onDismiss: _closeIncidentCard)
           : _showElectricShockEmergency
-          ? const ElectricShockEmergencyScreen()
+          ? ElectricShockEmergencyScreen(onDismiss: _closeIncidentCard)
           : _showPoisoningEmergency
-          ? const PoisoningEmergencyScreen()
+          ? PoisoningEmergencyScreen(onDismiss: _closeIncidentCard)
           : _showSeizureEmergency
-          ? const SeizureEmergencyScreen()
+          ? SeizureEmergencyScreen(onDismiss: _closeIncidentCard)
           : _showStrokeEmergency
-          ? const StrokeEmergencyScreen()
+          ? StrokeEmergencyScreen(onDismiss: _closeIncidentCard)
           : _showChestPainEmergency
-          ? const ChestPainEmergencyScreen()
+          ? ChestPainEmergencyScreen(onDismiss: _closeIncidentCard)
           : _showBurnEmergency
-          ? const BurnEmergencyScreen()
+          ? BurnEmergencyScreen(onDismiss: _closeIncidentCard)
           : _showBleedingEmergency
-          ? const BleedingEmergencyScreen()
+          ? BleedingEmergencyScreen(onDismiss: _closeIncidentCard)
           : _showChokingEmergency
-          ? const ChokingEmergencyScreen()
+          ? ChokingEmergencyScreen(onDismiss: _closeIncidentCard)
           : _showCommonEmergencies
           ? CommonEmergenciesScreen(
+              onDismiss: _closeIncidentCard,
               onChokingTap: _openChokingEmergency,
               onBleedingTap: _openBleedingEmergency,
               onBurnTap: _openBurnEmergency,

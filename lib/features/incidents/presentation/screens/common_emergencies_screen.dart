@@ -4,11 +4,13 @@ import 'package:url_launcher/url_launcher.dart';
 class CommonEmergenciesScreen extends StatelessWidget {
   const CommonEmergenciesScreen({
     super.key,
+    required this.onDismiss,
     required this.onChokingTap,
     required this.onBleedingTap,
     required this.onBurnTap,
   });
 
+  final VoidCallback onDismiss;
   final VoidCallback onChokingTap;
   final VoidCallback onBleedingTap;
   final VoidCallback onBurnTap;
@@ -28,15 +30,22 @@ class CommonEmergenciesScreen extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20, bottom: 14),
-              child: Text(
-                'CUIDA+',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontSize: 20,
-                  color: const Color(0xFF1F6A4C),
-                  fontWeight: FontWeight.w800,
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onDismiss,
+              child: SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 14),
+                  child: Text(
+                    'CUIDA+',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontSize: 20,
+                      color: const Color(0xFF1F6A4C),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
               ),
             ),
